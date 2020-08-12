@@ -70,9 +70,9 @@ func makeCRDAnnotated(group, kind string, versions map[string]bool, labels, anno
 
 func TestNewDuckHunter(t *testing.T) {
 	tests := map[string]struct {
-		mapper   ResourceMapper
-		versions []v1alpha1.DuckVersion
-		want     *duckHunter
+		mapper          ResourceMapper
+		defaultVersions []v1alpha1.DuckVersion
+		want            *duckHunter
 	}{
 		"no defaultVersions": {
 			want: &duckHunter{
@@ -82,7 +82,7 @@ func TestNewDuckHunter(t *testing.T) {
 			},
 		},
 		"one defaultVersions": {
-			versions: []v1alpha1.DuckVersion{
+			defaultVersions: []v1alpha1.DuckVersion{
 				{Name: "v1"},
 			},
 			want: &duckHunter{
@@ -94,7 +94,7 @@ func TestNewDuckHunter(t *testing.T) {
 			},
 		},
 		"non nil mapper": {
-			versions: []v1alpha1.DuckVersion{
+			defaultVersions: []v1alpha1.DuckVersion{
 				{Name: "v1"},
 			},
 			mapper: NewResourceMapper([]*metav1.APIResourceList{{
@@ -121,7 +121,7 @@ func TestNewDuckHunter(t *testing.T) {
 			},
 		},
 		"three defaultVersions": {
-			versions: []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}},
+			defaultVersions: []v1alpha1.DuckVersion{{Name: "v1"}, {Name: "v2"}, {Name: "v3"}},
 			want: &duckHunter{
 				mapper:          NewResourceMapper(nil),
 				defaultVersions: []string{"v1", "v2", "v3"},
@@ -133,7 +133,7 @@ func TestNewDuckHunter(t *testing.T) {
 			},
 		},
 		"overlapping defaultVersions": {
-			versions: []v1alpha1.DuckVersion{
+			defaultVersions: []v1alpha1.DuckVersion{
 				{Name: "v1"}, {Name: "v2"}, {Name: "v2"},
 			},
 			want: &duckHunter{
@@ -147,7 +147,7 @@ func TestNewDuckHunter(t *testing.T) {
 		}}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			if got := NewDuckHunter(tc.mapper, tc.versions, nil); !reflect.DeepEqual(got, tc.want) {
+			if got := NewDuckHunter(tc.mapper, tc.defaultVersions, nil); !reflect.DeepEqual(got, tc.want) {
 				t.Errorf("NewDuckHunter() = %v, want %v", got, tc.want)
 			}
 		})
